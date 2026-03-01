@@ -1,100 +1,98 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Funtubx AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funtubx AI</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      text-align: center;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
+}
 
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-    }
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+}
 
-    .logo {
-      font-size: 22px;
-      font-weight: bold;
-    }
+.logo{
+  font-size:22px;
+  font-weight:bold;
+}
 
-    .btn {
-      padding: 10px 18px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      background: linear-gradient(45deg, #7c3aed, #9333ea);
-      color: white;
-    }
+button{
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
-    .container {
-      margin-top: 40px;
-      padding: 20px;
-    }
+.login-btn{
+  background:linear-gradient(45deg,#7b2ff7,#f107a3);
+  color:white;
+}
 
-    textarea {
-      width: 90%;
-      max-width: 500px;
-      height: 100px;
-      border-radius: 10px;
-      padding: 10px;
-      border: none;
-      font-size: 16px;
-    }
+.logout-btn{
+  background:#ff4d4d;
+  color:white;
+  display:none;
+}
 
-    .generate-btn {
-      margin-top: 15px;
-    }
+.container{
+  margin-top:40px;
+}
 
-    img {
-      margin-top: 25px;
-      max-width: 90%;
-      border-radius: 15px;
-    }
+textarea{
+  width:85%;
+  max-width:500px;
+  height:120px;
+  border-radius:10px;
+  border:none;
+  padding:15px;
+  font-size:16px;
+}
 
-    #logoutBtn {
-      display: none;
-      margin-left: 10px;
-      background: crimson;
-    }
-  </style>
+.generate-btn{
+  margin-top:15px;
+  background:linear-gradient(45deg,#7b2ff7,#f107a3);
+  color:white;
+}
+
+#userInfo{
+  margin-top:15px;
+  font-size:14px;
+}
+</style>
 </head>
 
 <body>
 
 <header>
-  <div class="logo">🚀 ফানটুবক্স এআই</div>
-  <div>
-    <button class="btn" onclick="googleLogin()">লগইন</button>
-    <button class="btn" id="logoutBtn" onclick="logoutUser()">লগআউট</button>
-  </div>
+<div class="logo">🚀 Funtubx AI</div>
+<div>
+<button class="login-btn" onclick="googleLogin()">Login</button>
+<button class="logout-btn" onclick="logoutUser()">Logout</button>
+</div>
 </header>
 
 <div class="container">
-  <h2>এআই ইমেজ জেনারেটর</h2>
-  <textarea id="promptInput" placeholder="যেমন: সুন্দর কুকুর"></textarea>
-  <br>
-  <button class="btn generate-btn" onclick="generateImage()">উৎপন্ন করুন</button>
+<h2>AI Image Generator</h2>
+<textarea placeholder="Example: beautiful dog"></textarea><br>
+<button class="generate-btn">Generate</button>
 
-  <div>
-    <img id="resultImage" src="">
-  </div>
+<div id="userInfo"></div>
 </div>
 
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBSafcrzkEn61j31wmPFzNmOn_44yJd6Sc",
@@ -102,45 +100,39 @@ const firebaseConfig = {
   projectId: "funtubx-ai",
   storageBucket: "funtubx-ai.firebasestorage.app",
   messagingSenderId: "865993292255",
-  appId: "1:865993292255:web:2650328993de0923ca2c6a"
+  appId: "1:865993292255:web:2650328993de0923ca2c6a",
+  measurementId: "G-XFPKW8Q23F"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Login
-window.googleLogin = function () {
+window.googleLogin = function(){
   signInWithRedirect(auth, provider);
 };
 
-// Logout
-window.logoutUser = function () {
+window.logoutUser = function(){
   signOut(auth);
 };
 
-// Handle redirect result
-getRedirectResult(auth).catch((error) => {
-  console.error(error);
-});
+getRedirectResult(auth).catch(()=>{});
 
-// Detect login state
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    alert("Login Successful 🎉");
-    document.getElementById("logoutBtn").style.display = "inline-block";
+onAuthStateChanged(auth, (user)=>{
+  const loginBtn = document.querySelector(".login-btn");
+  const logoutBtn = document.querySelector(".logout-btn");
+  const userInfo = document.getElementById("userInfo");
+
+  if(user){
+    loginBtn.style.display="none";
+    logoutBtn.style.display="inline-block";
+    userInfo.innerHTML = "Logged in as: " + user.displayName;
+  }else{
+    loginBtn.style.display="inline-block";
+    logoutBtn.style.display="none";
+    userInfo.innerHTML = "";
   }
 });
-
-// Simple demo image generator
-window.generateImage = function () {
-  const prompt = document.getElementById("promptInput").value;
-  if (!prompt) return alert("প্রম্পট লিখুন");
-
-  document.getElementById("resultImage").src =
-    "https://source.unsplash.com/600x400/?" + prompt;
-};
-
 </script>
 
 </body>
