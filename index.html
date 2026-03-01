@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>FunTubX AI Studio</title>
+</head>
+
+<body style="text-align:center; font-family:sans-serif; background:#f2f2f2; padding-top:40px;">
+
+<h1>FunTubX AI Studio 🚀</h1>
+
+<input type="text" id="prompt" placeholder="Enter image prompt..."
+style="padding:10px; width:70%; border-radius:8px; border:1px solid #ccc;">
+
+<br><br>
+
+<button onclick="generateImage()"
+style="padding:10px 20px; font-size:18px; background:orange; border:none; border-radius:8px;">
+Generate AI Image
+</button>
+
+<div id="result" style="margin-top:20px;"></div>
+
+<script>
+function generateImage(){
+
+var userPrompt = document.getElementById("prompt").value;
+
+if(userPrompt === ""){
+alert("Please enter a prompt");
+return;
+}
+
+var resultDiv = document.getElementById("result");
+
+resultDiv.innerHTML = "<p>Generating AI image for: " + userPrompt + "</p>";
+
+// 🔥 নতুন ইমেজ URL (স্টেবল ভার্সন)
+var imageUrl = "https://image.pollinations.ai/prompt/" 
++ encodeURIComponent(userPrompt) 
++ "?width=512&height=512&seed=" + Math.floor(Math.random()*10000);
+
+var img = document.createElement("img");
+img.src = imageUrl;
+
+img.style.marginTop = "10px";
+img.style.borderRadius = "10px";
+img.style.maxWidth = "100%";
+
+img.onload = function(){
+resultDiv.appendChild(img);
+}
+
+img.onerror = function(){
+resultDiv.innerHTML = "<p style='color:red;'>Failed to load image. Check internet.</p>";
+}
+
+}
+</script>
+</body>
+</html>
