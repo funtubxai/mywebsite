@@ -1,229 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FunTubX AI Studio</title>
+  <meta charset="UTF-8">
+  <title>Funtubx AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      text-align: center;
+    }
 
-body{
-  background: linear-gradient(135deg,#0f172a,#1e1b4b);
-  color:white;
-}
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
 
-/* NAVBAR */
-.navbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 25px;
-  background:#111827;
-}
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+    }
 
-.logo{
-  font-size:22px;
-  font-weight:bold;
-}
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(45deg, #7c3aed, #9333ea);
+      color: white;
+    }
 
-.login-btn{
-  background:linear-gradient(90deg,#8b5cf6,#6366f1);
-  border:none;
-  padding:8px 16px;
-  border-radius:8px;
-  color:white;
-  cursor:pointer;
-}
+    .container {
+      margin-top: 40px;
+      padding: 20px;
+    }
 
-/* LAYOUT */
-.layout{
-  display:flex;
-  min-height:calc(100vh - 60px);
-}
+    textarea {
+      width: 90%;
+      max-width: 500px;
+      height: 100px;
+      border-radius: 10px;
+      padding: 10px;
+      border: none;
+      font-size: 16px;
+    }
 
-/* SIDEBAR */
-.sidebar{
-  width:220px;
-  background:#111827;
-  padding:25px;
-}
+    .generate-btn {
+      margin-top: 15px;
+    }
 
-.sidebar p{
-  margin:18px 0;
-  cursor:pointer;
-  transition:0.3s;
-}
+    img {
+      margin-top: 25px;
+      max-width: 90%;
+      border-radius: 15px;
+    }
 
-.sidebar p:hover{
-  color:#8b5cf6;
-}
-
-/* MAIN */
-.main{
-  flex:1;
-  padding:40px;
-}
-
-.main h2{
-  margin-bottom:20px;
-}
-
-/* TEXTAREA */
-textarea{
-  width:100%;
-  height:100px;
-  border-radius:12px;
-  border:none;
-  padding:15px;
-  font-size:16px;
-  margin-bottom:20px;
-}
-
-/* BUTTON */
-.generate-btn{
-  padding:12px 25px;
-  border:none;
-  border-radius:10px;
-  font-size:16px;
-  cursor:pointer;
-  background:linear-gradient(90deg,#8b5cf6,#6366f1);
-  color:white;
-  transition:0.3s;
-}
-
-.generate-btn:hover{
-  transform:scale(1.05);
-}
-
-/* IMAGE GRID */
-.grid{
-  margin-top:30px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
-}
-
-.grid img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-  border-radius:12px;
-  transition:0.3s;
-}
-
-.grid img:hover{
-  transform:scale(1.05);
-}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  .layout{
-    flex-direction:column;
-  }
-
-  .sidebar{
-    width:100%;
-    display:flex;
-    justify-content:space-around;
-  }
-
-  .main{
-    padding:20px;
-  }
-}
-</style>
+    #logoutBtn {
+      display: none;
+      margin-left: 10px;
+      background: crimson;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="navbar">
-  <div class="logo">🚀 FunTubX AI</div>
-  <button class="login-btn">Login</button>
+<header>
+  <div class="logo">🚀 ফানটুবক্স এআই</div>
+  <div>
+    <button class="btn" onclick="googleLogin()">লগইন</button>
+    <button class="btn" id="logoutBtn" onclick="logoutUser()">লগআউট</button>
+  </div>
+</header>
+
+<div class="container">
+  <h2>এআই ইমেজ জেনারেটর</h2>
+  <textarea id="promptInput" placeholder="যেমন: সুন্দর কুকুর"></textarea>
+  <br>
+  <button class="btn generate-btn" onclick="generateImage()">উৎপন্ন করুন</button>
+
+  <div>
+    <img id="resultImage" src="">
+  </div>
 </div>
 
-<div class="layout">
-
-  <div class="sidebar">
-    <p>✨ Generate</p>
-    <p>🕘 History</p>
-    <p>⭐ Favorites</p>
-    <p>⚙ Settings</p>
-  </div>
-
-  <div class="main">
-    <h2>AI Image Generator</h2>
-
-    <textarea placeholder="Describe your image..."></textarea>
-
-    <button class="generate-btn" onclick="generateImages()">Generate</button>
-
-    <div class="grid" id="imageGrid"></div>
-  </div>
-
-</div>
-
-<script>
-function generateImages(){
-  const grid = document.getElementById("imageGrid");
-  grid.innerHTML = "";
-
-  for(let i=1;i<=4;i++){
-    let img = document.createElement("img");
-    img.src = "https://picsum.photos/400?random=" + Math.random();
-    grid.appendChild(img);
-  }
-}
-</script>
 <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } 
-from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBSafcrzkEn61j31wmPFzNmOn_44yJd6Sc",
-    authDomain: "funtubx-ai.firebaseapp.com",
-    projectId: "funtubx-ai",
-    storageBucket: "funtubx-ai.firebasestorage.app",
-    messagingSenderId: "865993292255",
-    appId: "1:865993292255:web:2650328993de0923ca2c6a",
-    measurementId: "G-XFPKW8Q23F"
-  };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } 
+from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyBSafcrzkEn61j31wmPFzNmOn_44yJd6Sc",
+  authDomain: "funtubx-ai.firebaseapp.com",
+  projectId: "funtubx-ai",
+  storageBucket: "funtubx-ai.firebasestorage.app",
+  messagingSenderId: "865993292255",
+  appId: "1:865993292255:web:2650328993de0923ca2c6a"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// Login
 window.googleLogin = function () {
-  signInWithPopup(auth, provider)
-    .then((result) => {
-      alert("Login Successful 🎉");
-      console.log(result.user);
-    })
-    .catch((error) => {
-      alert("Login Failed ❌");
-      console.error(error);
-    });
+  signInWithRedirect(auth, provider);
 };
 
+// Logout
 window.logoutUser = function () {
-  signOut(auth).then(() => {
-    alert("Logged out");
-  });
+  signOut(auth);
 };
+
+// Handle redirect result
+getRedirectResult(auth).catch((error) => {
+  console.error(error);
+});
+
+// Detect login state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    alert("Login Successful 🎉");
+    document.getElementById("logoutBtn").style.display = "inline-block";
+  }
+});
+
+// Simple demo image generator
+window.generateImage = function () {
+  const prompt = document.getElementById("promptInput").value;
+  if (!prompt) return alert("প্রম্পট লিখুন");
+
+  document.getElementById("resultImage").src =
+    "https://source.unsplash.com/600x400/?" + prompt;
+};
+
 </script>
+
 </body>
 </html>
