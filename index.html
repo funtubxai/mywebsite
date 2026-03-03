@@ -1,98 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Funtubx AI</title>
-<style>
-  body { margin:0; font-family:Arial, sans-serif; background:linear-gradient(135deg,#0f2027,#203a43,#2c5364); color:white; text-align:center; }
-  header { display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background: rgba(0,0,0,0.2); }
-  .logo { font-size:22px; font-weight:bold; }
-  button { padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; }
-  .login-btn { background:linear-gradient(45deg,#7b2ff7,#f107a3); color:white; }
-  .logout-btn { background:#ff4d4d; color:white; display:none; }
-  .container { margin-top:40px; padding: 20px; }
-  textarea { width:90%; max-width:500px; height:120px; border-radius:10px; border:none; padding:15px; font-size:16px; margin-bottom: 10px; }
-  .generate-btn { background:linear-gradient(45deg,#7b2ff7,#f107a3); color:white; width: 200px; font-size: 18px; }
-  #userInfo { margin-top:15px; font-size:16px; color: #00ffcc; font-weight: bold; }
-</style>
+  <title>Funtubx AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body{
+      margin:0;
+      font-family:Arial, sans-serif;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:white;
+      text-align:center;
+    }
+
+    .container{
+      margin-top:60px;
+      padding:20px;
+    }
+
+    textarea{
+      width:90%;
+      height:120px;
+      border-radius:10px;
+      border:none;
+      padding:10px;
+      font-size:16px;
+    }
+
+    button{
+      padding:12px 25px;
+      border:none;
+      border-radius:8px;
+      margin-top:15px;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    .login-btn{
+      background:linear-gradient(45deg,#ff00cc,#3333ff);
+      color:white;
+    }
+
+    .generate-btn{
+      background:linear-gradient(45deg,#00c6ff,#0072ff);
+      color:white;
+    }
+  </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">🚀 Funtubx AI</div>
-  <div>
-    <button class="login-btn" id="loginBtn" onclick="googleLogin()">Login</button>
-    <button class="logout-btn" id="logoutBtn" onclick="logoutUser()">Logout</button>
-  </div>
-</header>
-
 <div class="container">
+
+  <h1>🚀 Funtubx AI</h1>
+
+  <button class="login-btn" onclick="googleLogin()">Login with Google</button>
+
+  <br><br>
+
   <h2>AI Image Generator</h2>
-  <textarea id="promptInput" placeholder="Example: A futuristic city in 2077"></textarea><br>
+
+  <textarea placeholder="Example: A futuristic city in 2077"></textarea>
+
+  <br>
+
   <button class="generate-btn">Generate Image</button>
+
   <div id="userInfo"></div>
+
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyB24cm4x-YVJkA1zr0oQuCeWSww4zcsFuQ",
-    authDomain: "funtubx-ai.firebaseapp.com",
-    projectId: "funtubx-ai",
-    storageBucket: "funtubx-ai.firebasestorage.app",
-    messagingSenderId: "865993292255",
-    appId: "1:865993292255:web:2650328993de0923ca2c6a",
-    measurementId: "G-XFPKW8Q23F"
-  };
+import { initializeApp } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+import { 
+  getAuth,
+  GoogleAuthProvider,
+  signInWithRedirect,
+  getRedirectResult,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  // ১. লগইন ফাংশন (Redirect পদ্ধতি মোবাইলের জন্য সেরা)
-  window.googleLogin = function() {
-    signInWithRedirect(auth, provider);
-  };
 
-  // ২. লগআউট ফাংশন
-  window.logoutUser = function() {
-    signOut(auth).then(() => {
-      alert("Logged out successfully!");
-    });
-  };
+// 🔥 YOUR REAL FIREBASE CONFIG (FROM PROJECT SETTINGS)
+const firebaseConfig = {
+  apiKey: "AIzaSyBRgNnpNRr53wEnwFMm2X_gQWxSCu3iVgM",
+  authDomain: "funtubx-ai.firebaseapp.com",
+  projectId: "funtubx-ai",
+  storageBucket: "funtubx-ai.appspot.com",
+  messagingSenderId: "865993292255",
+  appId: "1:865993292255:web:2650328993de0923ca2c6a",
+  measurementId: "G-XFPKW8Q23F"
+};
 
-  // ৩. লগইন রেজাল্ট চেক করা (রিডাইরেক্ট হয়ে ফিরে আসার পর এটি কাজ করে)
-  getRedirectResult(auth)
-    .then((result) => {
-      if (result) {
-        console.log("Logged in user:", result.user);
-      }
-    })
-    .catch((error) => {
-      alert("Error during login: " + error.message);
-    });
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-  // ৪. ইউজারের অবস্থা পর্যবেক্ষণ করা (UI আপডেট)
-  onAuthStateChanged(auth, (user) => {
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const userInfo = document.getElementById("userInfo");
+window.googleLogin = function(){
+  signInWithRedirect(auth, provider);
+};
 
-    if (user) {
-      loginBtn.style.display = "none";
-      logoutBtn.style.display = "inline-block";
-      userInfo.innerHTML = "Welcome, " + user.displayName + "!";
-    } else {
-      loginBtn.style.display = "inline-block";
-      logoutBtn.style.display = "none";
-      userInfo.innerHTML = "Please login to generate images";
-    }
-  });
+getRedirectResult(auth)
+.then((result) => {
+  if(result){
+    console.log("Logged in:", result.user);
+  }
+})
+.catch((error) => {
+  alert("Login Error: " + error.message);
+});
+
+onAuthStateChanged(auth, (user) => {
+  const userInfo = document.getElementById("userInfo");
+
+  if(user){
+    userInfo.innerHTML = `
+      <p>Welcome, ${user.displayName}</p>
+      <button onclick="logoutUser()">Logout</button>
+    `;
+  }else{
+    userInfo.innerHTML = "";
+  }
+});
+
+window.logoutUser = function(){
+  signOut(auth);
+};
+
 </script>
 
 </body>
 </html>
-
