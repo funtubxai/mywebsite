@@ -1,135 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Funtubx AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Funtubx AI</title>
 
-  <style>
-    body{
-      margin:0;
-      font-family:Arial, sans-serif;
-      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-      color:white;
-      text-align:center;
-    }
+<style>
 
-    .container{
-      margin-top:60px;
-      padding:20px;
-    }
+body{
+margin:0;
+font-family:Arial;
+background:#0f172a;
+color:white;
+display:flex;
+height:100vh;
+}
 
-    textarea{
-      width:90%;
-      height:120px;
-      border-radius:10px;
-      border:none;
-      padding:10px;
-      font-size:16px;
-    }
+.sidebar{
+width:220px;
+background:#020617;
+padding:20px;
+}
 
-    button{
-      padding:12px 25px;
-      border:none;
-      border-radius:8px;
-      margin-top:15px;
-      font-size:16px;
-      cursor:pointer;
-    }
+.sidebar h2{
+color:#38bdf8;
+}
 
-    .login-btn{
-      background:linear-gradient(45deg,#ff00cc,#3333ff);
-      color:white;
-    }
+.sidebar a{
+display:block;
+color:#94a3b8;
+margin:15px 0;
+text-decoration:none;
+}
 
-    .generate-btn{
-      background:linear-gradient(45deg,#00c6ff,#0072ff);
-      color:white;
-    }
-  </style>
+.main{
+flex:1;
+padding:40px;
+}
+
+textarea{
+width:100%;
+height:100px;
+border-radius:10px;
+border:none;
+padding:15px;
+font-size:16px;
+}
+
+button{
+margin-top:15px;
+padding:12px 25px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+
+.image-grid{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fill,200px);
+gap:20px;
+}
+
+.image-grid img{
+width:100%;
+border-radius:10px;
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="sidebar">
+<h2>Funtubx AI</h2>
 
-  <h1>🚀 Funtubx AI</h1>
-
-  <button class="login-btn" onclick="googleLogin()">Login with Google</button>
-
-  <br><br>
-
-  <h2>AI Image Generator</h2>
-
-  <textarea placeholder="Example: A futuristic city in 2077"></textarea>
-
-  <br>
-
-  <button class="generate-btn">Generate Image</button>
-
-  <div id="userInfo"></div>
+<a href="#">Dashboard</a>
+<a href="#">Generate</a>
+<a href="#">History</a>
+<a href="#">Account</a>
 
 </div>
 
-<script type="module">
+<div class="main">
 
-import { initializeApp } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+<h1>AI Image Generator</h1>
 
-import { 
-  getAuth,
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+<textarea id="prompt" placeholder="Describe your image..."></textarea>
 
+<br>
 
-// 🔥 YOUR REAL FIREBASE CONFIG (FROM PROJECT SETTINGS)
-const firebaseConfig = {
-  apiKey: "AIzaSyBRgNnpNRr53wEnwFMm2X_gQWxSCu3iVgM",
-  authDomain: "funtubx-ai.firebaseapp.com",
-  projectId: "funtubx-ai",
-  storageBucket: "funtubx-ai.appspot.com",
-  messagingSenderId: "865993292255",
-  appId: "1:865993292255:web:2650328993de0923ca2c6a",
-  measurementId: "G-XFPKW8Q23F"
-};
+<button onclick="generateImage()">
+Generate Image
+</button>
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+<div id="loader" style="display:none;margin-top:20px;">
+Generating image...
+</div>
 
-window.googleLogin = function(){
-  signInWithRedirect(auth, provider);
-};
+<div class="image-grid" id="results"></div>
 
-getRedirectResult(auth)
-.then((result) => {
-  if(result){
-    console.log("Logged in:", result.user);
-  }
-})
-.catch((error) => {
-  alert("Login Error: " + error.message);
+</div>
+
+<script>
+
+async function generateImage(){
+
+const prompt=document.getElementById("prompt").value;
+
+document.getElementById("loader").style.display="block";
+
+const res=await fetch("/.netlify/functions/generate",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({prompt})
 });
 
-onAuthStateChanged(auth, (user) => {
-  const userInfo = document.getElementById("userInfo");
+const data=await res.json();
 
-  if(user){
-    userInfo.innerHTML = `
-      <p>Welcome, ${user.displayName}</p>
-      <button onclick="logoutUser()">Logout</button>
-    `;
-  }else{
-    userInfo.innerHTML = "";
-  }
+document.getElementById("loader").style.display="none";
+
+const container=document.getElementById("results");
+
+container.innerHTML="";
+
+data.data.forEach(img=>{
+
+const card=document.createElement("div");
+
+card.innerHTML=`
+<img src="${img.url}">
+<br>
+<a href="${img.url}" download target="_blank">
+<button>Download</button>
+</a>
+`;
+
+container.appendChild(card);
+
 });
 
-window.logoutUser = function(){
-  signOut(auth);
-};
+}
 
 </script>
 
