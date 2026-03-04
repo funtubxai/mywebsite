@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Funtubx AI</title>
+<title>Funtubx AI Studio</title>
 
 <style>
 
@@ -26,9 +26,10 @@ color:#38bdf8;
 
 .sidebar a{
 display:block;
-color:#94a3b8;
 margin:15px 0;
+color:#94a3b8;
 text-decoration:none;
+cursor:pointer;
 }
 
 .main{
@@ -67,43 +68,57 @@ width:100%;
 border-radius:10px;
 }
 
+.chatbox{
+background:#020617;
+padding:15px;
+border-radius:10px;
+margin-top:20px;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="sidebar">
+
 <h2>Funtubx AI</h2>
 
-<a href="#">Dashboard</a>
-<a href="#">Generate</a>
-<a href="#">History</a>
-<a href="#">Account</a>
+<a onclick="showImage()">Image AI</a>
+<a onclick="showChat()">Chat AI</a>
+
 </div>
 
 <div class="main">
 
-<h1>AI Image Generator</h1>
-
 <h3>Credits: <span id="creditCount"></span></h3>
 
-<textarea id="prompt" placeholder="Describe your image..."></textarea>
+<div id="imageTool">
 
-<br>
+<h1>AI Image Generator</h1>
 
-<button onclick="generateImage()">
-Generate Image
-</button>
+<textarea id="prompt" placeholder="Describe your image"></textarea>
 
-<div id="loader" style="display:none;margin-top:20px;">
-Generating image...
-</div>
+<button onclick="generateImage()">Generate Image</button>
+
+<div id="loader" style="display:none;">Generating...</div>
 
 <div class="image-grid" id="results"></div>
 
-<h2>History</h2>
+</div>
 
-<div class="image-grid" id="history"></div>
+
+<div id="chatTool" style="display:none;">
+
+<h1>Chat AI</h1>
+
+<textarea id="chatInput" placeholder="Ask AI anything"></textarea>
+
+<button onclick="askAI()">Ask AI</button>
+
+<div id="chatResult" class="chatbox"></div>
+
+</div>
 
 </div>
 
@@ -112,52 +127,30 @@ Generating image...
 let credits = localStorage.getItem("credits");
 
 if(!credits){
-credits = 5;
+credits=10;
 localStorage.setItem("credits",credits);
 }
 
-document.getElementById("creditCount").innerText = credits;
+document.getElementById("creditCount").innerText=credits;
 
-function saveHistory(url){
 
-let history=JSON.parse(localStorage.getItem("ai_history")) || [];
-
-history.unshift(url);
-
-localStorage.setItem("ai_history",JSON.stringify(history));
-
-loadHistory();
-
+function showImage(){
+document.getElementById("imageTool").style.display="block";
+document.getElementById("chatTool").style.display="none";
 }
 
-function loadHistory(){
-
-const history=JSON.parse(localStorage.getItem("ai_history")) || [];
-
-const container=document.getElementById("history");
-
-container.innerHTML="";
-
-history.forEach(img=>{
-
-const card=document.createElement("div");
-
-card.innerHTML=`<img src="${img}">`;
-
-container.appendChild(card);
-
-});
-
+function showChat(){
+document.getElementById("imageTool").style.display="none";
+document.getElementById("chatTool").style.display="block";
 }
 
-window.onload=loadHistory;
 
 async function generateImage(){
 
-let credits = localStorage.getItem("credits");
+let credits=localStorage.getItem("credits");
 
-if(credits <= 0){
-alert("Your credits finished!");
+if(credits<=0){
+alert("No credits left");
 return;
 }
 
@@ -181,16 +174,10 @@ container.innerHTML="";
 
 data.data.forEach(img=>{
 
-saveHistory(img.url);
-
 const card=document.createElement("div");
 
 card.innerHTML=`
 <img src="${img.url}">
-<br>
-<a href="${img.url}" download target="_blank">
-<button>Download</button>
-</a>
 `;
 
 container.appendChild(card);
@@ -201,7 +188,37 @@ credits--;
 
 localStorage.setItem("credits",credits);
 
-document.getElementById("creditCount").innerText = credits;
+document.getElementById("creditCount").innerText=credits;
+
+}
+
+
+async function askAI(){
+
+let credits=localStorage.getItem("credits");
+
+if(credits<=0){
+alert("No credits left");
+return;
+}
+
+const question=document.getElementById("chatInput").value;
+
+const res=await fetch("/.netlify/functions/chat",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({question})
+});
+
+const data=await res.json();
+
+document.getElementById("chatResult").innerText=data.reply;
+
+credits--;
+
+localStorage.setItem("credits",credits);
+
+document.getElementById("creditCount").innerText=credits;
 
 }
 
