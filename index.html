@@ -79,12 +79,13 @@ border-radius:10px;
 <a href="#">Generate</a>
 <a href="#">History</a>
 <a href="#">Account</a>
-
 </div>
 
 <div class="main">
 
 <h1>AI Image Generator</h1>
+
+<h3>Credits: <span id="creditCount"></span></h3>
 
 <textarea id="prompt" placeholder="Describe your image..."></textarea>
 
@@ -100,11 +101,65 @@ Generating image...
 
 <div class="image-grid" id="results"></div>
 
+<h2>History</h2>
+
+<div class="image-grid" id="history"></div>
+
 </div>
 
 <script>
 
+let credits = localStorage.getItem("credits");
+
+if(!credits){
+credits = 5;
+localStorage.setItem("credits",credits);
+}
+
+document.getElementById("creditCount").innerText = credits;
+
+function saveHistory(url){
+
+let history=JSON.parse(localStorage.getItem("ai_history")) || [];
+
+history.unshift(url);
+
+localStorage.setItem("ai_history",JSON.stringify(history));
+
+loadHistory();
+
+}
+
+function loadHistory(){
+
+const history=JSON.parse(localStorage.getItem("ai_history")) || [];
+
+const container=document.getElementById("history");
+
+container.innerHTML="";
+
+history.forEach(img=>{
+
+const card=document.createElement("div");
+
+card.innerHTML=`<img src="${img}">`;
+
+container.appendChild(card);
+
+});
+
+}
+
+window.onload=loadHistory;
+
 async function generateImage(){
+
+let credits = localStorage.getItem("credits");
+
+if(credits <= 0){
+alert("Your credits finished!");
+return;
+}
 
 const prompt=document.getElementById("prompt").value;
 
@@ -126,6 +181,8 @@ container.innerHTML="";
 
 data.data.forEach(img=>{
 
+saveHistory(img.url);
+
 const card=document.createElement("div");
 
 card.innerHTML=`
@@ -139,6 +196,12 @@ card.innerHTML=`
 container.appendChild(card);
 
 });
+
+credits--;
+
+localStorage.setItem("credits",credits);
+
+document.getElementById("creditCount").innerText = credits;
 
 }
 
