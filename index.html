@@ -4,102 +4,101 @@
 <meta charset="UTF-8">
 <title>Funtubx AI Studio</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
 <style>
 
 body{
 margin:0;
-font-family:Poppins;
-background:#0b0f1a;
+font-family:Arial;
+background:#0f172a;
 color:white;
-overflow:hidden;
 }
 
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-}
+/* Sidebar */
 
 .sidebar{
 position:fixed;
 left:0;
 top:0;
-height:100%;
 width:220px;
-background:#12182a;
+height:100%;
+background:#020617;
 padding:20px;
 }
 
 .sidebar h2{
-font-family:Orbitron;
-color:#6c63ff;
+color:#38bdf8;
 }
 
-.menu{
-margin-top:40px;
+.sidebar ul{
+list-style:none;
+padding:0;
 }
 
-.menu button{
-display:block;
-width:100%;
-margin-bottom:10px;
-padding:10px;
-background:#1a2140;
-border:none;
-color:white;
+.sidebar li{
+padding:10px 0;
 cursor:pointer;
-border-radius:8px;
 }
 
-.menu button:hover{
-background:#6c63ff;
-}
+/* Main */
 
 .main{
 margin-left:240px;
-padding:40px;
+padding:20px;
 }
 
-.card{
-background:#12182a;
-padding:20px;
-border-radius:12px;
-max-width:700px;
-}
+/* Prompt box */
 
 textarea{
 width:100%;
 height:80px;
-border-radius:8px;
+background:#1e293b;
 border:none;
+color:white;
 padding:10px;
-margin-top:10px;
 }
 
-.generate{
-margin-top:10px;
-padding:12px 20px;
-background:#6c63ff;
+button{
+background:#38bdf8;
 border:none;
-border-radius:8px;
-color:white;
+padding:10px 20px;
+margin-top:10px;
 cursor:pointer;
 }
 
-.generate:hover{
-background:#8a7fff;
-}
+/* Image grid */
 
-.preview{
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
 margin-top:20px;
 }
 
-.preview img{
-max-width:100%;
-border-radius:10px;
+.grid img{
+width:100%;
+border-radius:8px;
+}
+
+/* Background animation */
+
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+radial-gradient(circle at 20% 20%, #38bdf8 1px, transparent 1px),
+radial-gradient(circle at 80% 80%, #38bdf8 1px, transparent 1px);
+background-size:60px 60px;
+opacity:0.2;
+animation:move 20s linear infinite;
+}
+
+@keyframes move{
+from{transform:translateY(0);}
+to{transform:translateY(-100px);}
 }
 
 </style>
@@ -107,105 +106,76 @@ border-radius:10px;
 
 <body>
 
-<canvas id="bg"></canvas>
+<!-- Sidebar -->
 
 <div class="sidebar">
 
 <h2>Funtubx AI</h2>
 
-<div class="menu">
-
-<button>Dashboard</button>
-<button>AI Image</button>
-<button>AI Chat</button>
-<button>AI Video</button>
-<button>History</button>
-<button>Account</button>
-
-</div>
+<ul>
+<li>AI Image</li>
+<li>AI Video</li>
+<li>AI Chat</li>
+<li>YouTube Studio</li>
+<li>History</li>
+</ul>
 
 </div>
+
+
+<!-- Main -->
 
 <div class="main">
-
-<div class="card">
 
 <h2>AI Image Generator</h2>
 
 <textarea id="prompt" placeholder="Describe your image..."></textarea>
 
-<button class="generate" onclick="generateImage()">Generate Image</button>
+<br>
 
-<div class="preview">
-<img id="output">
+<select id="style">
+<option>Cinematic</option>
+<option>Realistic</option>
+<option>Anime</option>
+<option>3D Render</option>
+</select>
+
+<br>
+
+<button onclick="generate()">Generate</button>
+
+
+<div class="grid" id="images"></div>
+
 </div>
 
-</div>
-
-</div>
 
 <script>
 
-function generateImage(){
+function generate(){
 
-let prompt=document.getElementById("prompt").value;
+let prompt=document.getElementById("prompt").value
 
-fetch("/api/generate",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({prompt})
-})
-.then(res=>res.json())
-.then(data=>{
-document.getElementById("output").src=data.image;
-})
+let grid=document.getElementById("images")
 
-}
+grid.innerHTML="Generating..."
 
-</script>
+/* demo images */
 
-<script>
+setTimeout(()=>{
 
-const canvas=document.getElementById("bg");
-const ctx=canvas.getContext("2d");
+grid.innerHTML=`
 
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
+<img src="https://picsum.photos/400?1">
+<img src="https://picsum.photos/400?2">
+<img src="https://picsum.photos/400?3">
+<img src="https://picsum.photos/400?4">
 
-let particles=[];
+`
 
-for(let i=0;i<100;i++){
-particles.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-vx:(Math.random()-0.5)*0.5,
-vy:(Math.random()-0.5)*0.5
-});
-}
-
-function animate(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-particles.forEach(p=>{
-
-p.x+=p.vx;
-p.y+=p.vy;
-
-ctx.fillStyle="#6c63ff";
-ctx.beginPath();
-ctx.arc(p.x,p.y,2,0,Math.PI*2);
-ctx.fill();
-
-});
-
-requestAnimationFrame(animate);
+},1000)
 
 }
-
-animate();
 
 </script>
 
