@@ -1,78 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Funtubx AI Studio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
 body{
 margin:0;
-font-family:Arial;
-background:#0f172a;
+font-family:Poppins;
+background:#0b0f1a;
 color:white;
-display:flex;
-height:100vh;
+overflow:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
 }
 
 .sidebar{
+position:fixed;
+left:0;
+top:0;
+height:100%;
 width:220px;
-background:#020617;
+background:#12182a;
 padding:20px;
 }
 
 .sidebar h2{
-color:#38bdf8;
+font-family:Orbitron;
+color:#6c63ff;
 }
 
-.sidebar a{
+.menu{
+margin-top:40px;
+}
+
+.menu button{
 display:block;
-margin:15px 0;
-color:#94a3b8;
-text-decoration:none;
+width:100%;
+margin-bottom:10px;
+padding:10px;
+background:#1a2140;
+border:none;
+color:white;
 cursor:pointer;
+border-radius:8px;
+}
+
+.menu button:hover{
+background:#6c63ff;
 }
 
 .main{
-flex:1;
+margin-left:240px;
 padding:40px;
+}
+
+.card{
+background:#12182a;
+padding:20px;
+border-radius:12px;
+max-width:700px;
 }
 
 textarea{
 width:100%;
-height:100px;
-border-radius:10px;
+height:80px;
+border-radius:8px;
 border:none;
-padding:15px;
-font-size:16px;
+padding:10px;
+margin-top:10px;
 }
 
-button{
-margin-top:15px;
-padding:12px 25px;
-background:#2563eb;
-color:white;
+.generate{
+margin-top:10px;
+padding:12px 20px;
+background:#6c63ff;
 border:none;
 border-radius:8px;
+color:white;
 cursor:pointer;
 }
 
-.image-grid{
-margin-top:30px;
-display:grid;
-grid-template-columns:repeat(auto-fill,200px);
-gap:20px;
+.generate:hover{
+background:#8a7fff;
 }
 
-.image-grid img{
-width:100%;
-border-radius:10px;
-}
-
-.chatbox{
-background:#020617;
-padding:15px;
-border-radius:10px;
+.preview{
 margin-top:20px;
+}
+
+.preview img{
+max-width:100%;
+border-radius:10px;
 }
 
 </style>
@@ -80,43 +107,38 @@ margin-top:20px;
 
 <body>
 
+<canvas id="bg"></canvas>
+
 <div class="sidebar">
 
 <h2>Funtubx AI</h2>
 
-<a onclick="showImage()">Image AI</a>
-<a onclick="showChat()">Chat AI</a>
+<div class="menu">
+
+<button>Dashboard</button>
+<button>AI Image</button>
+<button>AI Chat</button>
+<button>AI Video</button>
+<button>History</button>
+<button>Account</button>
+
+</div>
 
 </div>
 
 <div class="main">
 
-<h3>Credits: <span id="creditCount"></span></h3>
+<div class="card">
 
-<div id="imageTool">
+<h2>AI Image Generator</h2>
 
-<h1>AI Image Generator</h1>
+<textarea id="prompt" placeholder="Describe your image..."></textarea>
 
-<textarea id="prompt" placeholder="Describe your image"></textarea>
+<button class="generate" onclick="generateImage()">Generate Image</button>
 
-<button onclick="generateImage()">Generate Image</button>
-
-<div id="loader" style="display:none;">Generating...</div>
-
-<div class="image-grid" id="results"></div>
-
+<div class="preview">
+<img id="output">
 </div>
-
-
-<div id="chatTool" style="display:none;">
-
-<h1>Chat AI</h1>
-
-<textarea id="chatInput" placeholder="Ask AI anything"></textarea>
-
-<button onclick="askAI()">Ask AI</button>
-
-<div id="chatResult" class="chatbox"></div>
 
 </div>
 
@@ -124,103 +146,66 @@ margin-top:20px;
 
 <script>
 
-let credits = localStorage.getItem("credits");
+function generateImage(){
 
-if(!credits){
-credits=10;
-localStorage.setItem("credits",credits);
-}
+let prompt=document.getElementById("prompt").value;
 
-document.getElementById("creditCount").innerText=credits;
-
-
-function showImage(){
-document.getElementById("imageTool").style.display="block";
-document.getElementById("chatTool").style.display="none";
-}
-
-function showChat(){
-document.getElementById("imageTool").style.display="none";
-document.getElementById("chatTool").style.display="block";
-}
-
-
-async function generateImage(){
-
-let credits=localStorage.getItem("credits");
-
-if(credits<=0){
-alert("No credits left");
-return;
-}
-
-const prompt=document.getElementById("prompt").value;
-
-document.getElementById("loader").style.display="block";
-
-const res=await fetch("/.netlify/functions/generate",{
+fetch("/api/generate",{
 method:"POST",
-headers:{"Content-Type":"application/json"},
+headers:{
+"Content-Type":"application/json"
+},
 body:JSON.stringify({prompt})
-});
-
-const data=await res.json();
-
-document.getElementById("loader").style.display="none";
-
-const container=document.getElementById("results");
-
-container.innerHTML="";
-
-data.data.forEach(img=>{
-
-const card=document.createElement("div");
-
-card.innerHTML=`
-<img src="${img.url}">
-`;
-
-container.appendChild(card);
-
-});
-
-credits--;
-
-localStorage.setItem("credits",credits);
-
-document.getElementById("creditCount").innerText=credits;
+})
+.then(res=>res.json())
+.then(data=>{
+document.getElementById("output").src=data.image;
+})
 
 }
 
+</script>
 
-async function askAI(){
+<script>
 
-let credits=localStorage.getItem("credits");
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
 
-if(credits<=0){
-alert("No credits left");
-return;
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let particles=[];
+
+for(let i=0;i<100;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vx:(Math.random()-0.5)*0.5,
+vy:(Math.random()-0.5)*0.5
+});
 }
 
-const question=document.getElementById("chatInput").value;
+function animate(){
 
-const res=await fetch("/.netlify/functions/chat",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({question})
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(p=>{
+
+p.x+=p.vx;
+p.y+=p.vy;
+
+ctx.fillStyle="#6c63ff";
+ctx.beginPath();
+ctx.arc(p.x,p.y,2,0,Math.PI*2);
+ctx.fill();
+
 });
 
-const data=await res.json();
-
-document.getElementById("chatResult").innerText=data.reply;
-
-credits--;
-
-localStorage.setItem("credits",credits);
-
-document.getElementById("creditCount").innerText=credits;
+requestAnimationFrame(animate);
 
 }
+
+animate();
 
 </script>
 
