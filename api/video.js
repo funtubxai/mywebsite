@@ -7,26 +7,20 @@ exports.handler = async function(event, context) {
 
   try {
     const { prompt } = JSON.parse(event.body);
-    
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
+    const response = await fetch("https://api.openai.com/v1/videos/generations", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
       },
       body: JSON.stringify({
-        model: "dall-e-3", // gpt-image-1 এর বদলে dall-e-3 ব্যবহার করা ভালো
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024"
+        model: "sora-1",
+        prompt: prompt
       })
     });
 
     const data = await response.json();
-    return {
-      statusCode: 200,
-      body: JSON.stringify(data)
-    };
+    return { statusCode: 200, body: JSON.stringify(data) };
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
