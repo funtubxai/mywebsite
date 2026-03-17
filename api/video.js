@@ -1,22 +1,33 @@
-export default async function handler(req, res) {
+const fetch = require('node-fetch');
 
-  const { prompt } = req.body;
+exports.handler = async function(event, context) {
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
+  }
 
-  const response = await fetch("https://api.openai.com/v1/videos/generations", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-    },
-    body: JSON.stringify({
-      model: "sora-mini",
-      prompt: prompt,
-      duration: 4
-    })
-  });
+  try {
+    const { prompt } = JSON.parse(event.body);
+    
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "dall-e-3", // gpt-image-1 এর বদলে dall-e-3 ব্যবহার করা ভালো
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024"
+      })
+    });
 
-  const data = await response.json();
-
-  res.status(200).json(data);
-
-}
+    const data = await response.json();
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data)
+    };
+  } catch (error) {
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+  }
+};
