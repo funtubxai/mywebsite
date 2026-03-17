@@ -1,0 +1,10 @@
+{
+  "name": "funtubx-ai-studio",
+  "version": "1.0.0",
+  "description": "AI Studio powered by Netlify Functions",
+  "main": "index.html",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
+
